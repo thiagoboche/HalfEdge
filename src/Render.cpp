@@ -868,7 +868,7 @@ void Render::deleta()
                 atual->getAnt()->setFace(externa);
                 atual->getTwin()->getProx()->setFace(externa);
             } else {
-                interface.addFace(vertices);
+                //interface.addFace(vertices);
             }
 
             atual->getAnt()->setProx(atual->getTwin()->getProx());
