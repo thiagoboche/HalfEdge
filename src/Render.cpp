@@ -825,66 +825,60 @@ void Render::deleta()
 
     if(vsel != NULL)
     {
-        if(interface.isExterna(hsel->getFace()) || interface.isExterna(hsel->getTwin()->getFace())){
-            HalfEdge *externa = hsel->getTwin(), *interna = hsel;
+        HalfEdge *origem  = vsel->getEdge();
+        HalfEdge *percorre = origem;
+        bool verticeExterno = false;
 
-            if (interface.isExterna(hsel->getFace()))
+        QVector<HalfEdge*> incidentes;
+        QVector<QPointF> vertices;
+        Face *externa;
+
+        do
+        {
+            HalfEdge *twin = percorre->getTwin();
+            incidentes.push_back(twin);
+
+            vertices.push_back(twin->getOrigem()->getPoint());
+
+            if(interface.isExterna(percorre->getFace()) && !verticeExterno)
             {
-                externa = hsel;
-                interna = hsel->getTwin();
+                externa = percorre->getFace();
+                verticeExterno = true;
             }
 
-            Vertex *origem  = hsel->getOrigem();
-            Vertex *destino = hsel->getDestino();
+            percorre = twin->getProx();
+        } while(percorre != origem);
 
-            QPair<QPointF,QPointF> par1  =
-                    QPair<QPointF,QPointF>(origem->getPoint(),destino->getPoint());
+        for(int i = 0; i < incidentes.size(); ++i)
+        {
+            Face *atual = incidentes.at(i)->getFace();
 
-            QPair<QPointF,QPointF> par2  =
-                    QPair<QPointF,QPointF>(destino->getPoint(),origem->getPoint());
-
-            interface.getMap().remove(par1);
-            interface.getMap().remove(par2);
-
-            Face * nExter = hsel->getFace();
-
-            if(interface.isExterna(hsel->getFace()))
+            if (!interface.isExterna(atual))
             {
-                nExter = hsel->getTwin()->getFace();
+                interface.removeFaceFromCollection(atual);
             }
-
-            QVector<Face *> faces = interface.getFaces();
-
-            for(int i = 0; i < faces.size(); i++)
-            {
-                Face *atual = faces[i];
-
-                if (atual == nExter)
-                {
-                    faces.remove(i);
-                    break;
-                }
-            }
-
-
-            //Atualizar a face das dentro do poligono
-            HalfEdge *it = interna->getProx();
-
-            while(it!= interna){
-                it->setFace(externa->getFace());
-                it = it->getProx();
-            }
-            //Atualizar a anterior e a proxima
-            externa->getAnt()->setProx(interna->getProx());
-            externa->getProx()->setAnt(interna->getAnt());
-
-            interna->getProx()->setAnt(externa->getAnt());
-            interna->getAnt()->setProx(externa->getProx());
-
-            hsel = NULL;
-            renderiza();
-            renderizaFront();
         }
+
+        for(int i = 0; i < incidentes.size(); ++i)
+        {
+            HalfEdge *atual = incidentes.at(i);
+
+            if(verticeExterno)
+            {
+                atual->getAnt()->setFace(externa);
+                atual->getTwin()->getProx()->setFace(externa);
+            } else {
+                interface.addFace(vertices);
+            }
+
+            atual->getAnt()->setProx(atual->getTwin()->getProx());
+
+            interface.removeEdgeFromCollection(atual);
+        }
+
+        vsel = NULL;
+        renderiza();
+        renderizaFront();
     }
 }
 
@@ -947,7 +941,6 @@ void Render::inserirVertice(QPointF p)
 
     HalfEdge* inicial = faceClicada->getOuterComp();
     HalfEdge* percorre = inicial;
-    HalfEdge* remover;
 
     do
     {
@@ -959,10 +952,7 @@ void Render::inserirVertice(QPointF p)
 
         interface.addFace(pontosFaceNova);
 
-        remover = percorre;
         percorre = percorre->getProx();
-
-        //interface.removeHalfEdgeFromCollection(remover);
     } while(percorre != inicial);
 
     interface.removeFaceFromCollection(faceClicada);

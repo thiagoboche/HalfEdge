@@ -2,7 +2,7 @@
 #include <QPainter>
 #include <Qt>
 #include <CommandQueue.h>
-#include <plywriter.h>
+#include "plywriter.h"
 
 MainWindow::MainWindow()
 {
