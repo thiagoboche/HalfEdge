@@ -44,7 +44,7 @@ Render::Render(int w, int h, CommandQueue *c) {
     mostraFace = false;
     mostraPonto = false;
 
-
+    modoInsercao = false;
 }
 
 void Render::run(void) {
@@ -104,6 +104,9 @@ void Render::run(void) {
                 break;
             case VDV:
                 vdv();
+                break;
+            case INSERIR_VERTICE:
+                trocarModoInsercao();
                 break;
         }
         atualizaScreen();
@@ -355,6 +358,17 @@ void Render::click(void)
     QRgb rgb = backBuffer->pixel(p2);
     p1 = destransforma(p2);
 
+    if(modoInsercao)
+    {
+        inserirVertice(p1);
+
+        trocarModoInsercao();
+
+        renderiza();
+        renderizaFront();
+
+        return;
+    }
 
     if(rgb == corVerticeGrosso)
     {
@@ -870,7 +884,6 @@ void Render::deleta()
             renderizaFront();
         }
     }
-    qDebug() << "Chegou!";
 }
 
 void Render::vdv()
@@ -911,4 +924,44 @@ void Render::vdv()
         prox = prox->getTwin()->getProx();
     } while (prox != partida2);
 
+}
+
+void Render::trocarModoInsercao()
+{
+    if(modoInsercao)
+    {
+        modoInsercao = false;
+    }
+    else
+    {
+        modoInsercao = true;
+    }
+}
+
+
+void Render::inserirVertice(QPointF p)
+{
+    Face* faceClicada = interface.getFaceNear(p);
+
+    HalfEdge* inicial = faceClicada->getOuterComp();
+    HalfEdge* percorre = inicial;
+    HalfEdge* remover;
+
+    do
+    {
+        QVector<QPointF> pontosFaceNova;
+
+        pontosFaceNova.push_back(p);
+        pontosFaceNova.push_back(percorre->getOrigem()->getPoint());
+        pontosFaceNova.push_back(percorre->getProx()->getOrigem()->getPoint());
+
+        interface.addFace(pontosFaceNova);
+
+        remover = percorre;
+        percorre = percorre->getProx();
+
+        interface.removeHalfEdgeFromCollection(remover);
+    } while(percorre != inicial);
+
+    interface.removeFaceFromCollection(faceClicada);
 }

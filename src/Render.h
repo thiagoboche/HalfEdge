@@ -60,6 +60,8 @@ private:
         bool componenteFaceUnica(HalfEdge *h);
         void deleta();
         void vdv();
+        void trocarModoInsercao();
+        void inserirVertice(QPointF p);
 
         Vertex* vsel;
         HalfEdge* hsel;
@@ -90,6 +92,8 @@ private:
         QPen faceExternaBack;
         QPen arestaGrossaBack;
         QPen verticeGrossoBack;        
+
+        bool modoInsercao;
 };
 
 uint qHash(const QPointF&);

@@ -177,7 +177,7 @@ void Interface::addExtEdges(void)
     rect.setLeft(minX);
     rect.setRight(maxX);
 
-    kdt = new KDTree(map.values(),rect);
+    //kdt = new KDTree(map.values(),rect);
 }
 
 HalfEdge* Interface::getArestaNear(QPointF p)
@@ -386,6 +386,19 @@ void Interface::removeEdgeFromCollection(HalfEdge* e)
         if(componentesFaceExterna[i] == e || componentesFaceExterna[i] == e->getTwin())
         {
             componentesFaceExterna[i] = componentesFaceExterna[i]->getProx();
+            break;
+        }
+    }
+}
+
+void Interface::removeHalfEdgeFromCollection(HalfEdge* e)
+{
+    QMap<QPair<QPointF,QPointF>, HalfEdge* >::iterator it;
+    for(it = map.begin(); it != map.end(); ++it)
+    {
+        if(e == it.value())
+        {
+            map.erase(it);
             break;
         }
     }

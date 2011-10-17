@@ -22,7 +22,7 @@ MainWindow::MainWindow()
 
     tb = new QToolBar("Tool Bar", this);
     fd = new QFileDialog(this, Qt::Window);
-    fd->setDirectory("../../halfedge/resources");
+    fd->setDirectory("../resources");
     fd->setFilter("*.ply");
     
     
@@ -45,6 +45,7 @@ MainWindow::MainWindow()
     face = tb->addAction(f, "");
     del = tb->addAction("deleta");
     vdv = tb->addAction("VDV");
+    inserirVertice = tb->addAction("inserir");
 
     addToolBar(Qt::LeftToolBarArea, tb);
 
@@ -57,8 +58,9 @@ MainWindow::MainWindow()
 void MainWindow::clicou(QAction* a)
 {
     if(a == open)
+    {
         fd->open();
-    else if(a == zoomIn)
+    }else if(a == zoomIn)
     {
         fila->produz(INCZOOM);
     }else if (a == zoomOut)
@@ -91,6 +93,9 @@ void MainWindow::clicou(QAction* a)
     }else if(a == vdv)
     {
         fila->produz(VDV);
+    }else if(a == inserirVertice)
+    {
+        fila->produz(INSERIR_VERTICE);
     }
 }
 

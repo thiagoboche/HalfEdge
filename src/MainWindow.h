@@ -32,6 +32,7 @@ private:
    QAction *face;
    QAction *del;
    QAction *vdv;
+   QAction *inserirVertice;
 
 };
 
