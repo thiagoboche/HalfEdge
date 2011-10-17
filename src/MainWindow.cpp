@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <Qt>
 #include <CommandQueue.h>
+#include <plywriter.h>
 
 MainWindow::MainWindow()
 {
@@ -21,7 +22,7 @@ MainWindow::MainWindow()
     setCentralWidget(centralpanel);
 
     tb = new QToolBar("Tool Bar", this);
-    fd = new QFileDialog(this, Qt::Window);
+    fd = new QFileDialog(this, Qt::Dialog);
     fd->setDirectory("../resources");
     fd->setFilter("*.ply");
     
@@ -45,7 +46,8 @@ MainWindow::MainWindow()
     face = tb->addAction(f, "");
     del = tb->addAction("deleta");
     vdv = tb->addAction("VDV");
-    inserirVertice = tb->addAction("inserir");
+    inserirVertice = tb->addAction("Inserir");
+    salvarArquivo = tb->addAction("Salvar");
 
     addToolBar(Qt::LeftToolBarArea, tb);
 
@@ -96,7 +98,11 @@ void MainWindow::clicou(QAction* a)
     }else if(a == inserirVertice)
     {
         fila->produz(INSERIR_VERTICE);
-    }
+    }else if(a == salvarArquivo) {
+        QString fileName = QFileDialog::getSaveFileName(0, "Save PLY", "../../halfedge/resources", "*.ply");
+        setSaveToFileName(fileName);
+        fila->produz(SALVAR_ARQUIVO);
+     }
 }
 
 void MainWindow::update(void)

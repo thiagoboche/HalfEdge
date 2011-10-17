@@ -2,7 +2,7 @@
 #include <QPaintDevice>
 #include <PlyParser.h>
 #include <QRgb>
-
+#include "plywriter.h"
 
 Render::Render(int w, int h, CommandQueue *c) {
 
@@ -108,6 +108,9 @@ void Render::run(void) {
             case INSERIR_VERTICE:
                 trocarModoInsercao();
                 break;
+        case SALVAR_ARQUIVO:
+            salvar_arquivo();
+            break;
         }
         atualizaScreen();
     } while (true);
@@ -820,9 +823,8 @@ void Render::deleta()
     //para verificar se a face f eh externa, use: interface.isExterna(f);
 
 
-    if(hsel != NULL)
+    if(vsel != NULL)
     {
-
         if(interface.isExterna(hsel->getFace()) || interface.isExterna(hsel->getTwin()->getFace())){
             HalfEdge *externa = hsel->getTwin(), *interna = hsel;
 
@@ -960,8 +962,12 @@ void Render::inserirVertice(QPointF p)
         remover = percorre;
         percorre = percorre->getProx();
 
-        interface.removeHalfEdgeFromCollection(remover);
+        //interface.removeHalfEdgeFromCollection(remover);
     } while(percorre != inicial);
 
     interface.removeFaceFromCollection(faceClicada);
+}
+
+void Render::salvar_arquivo() {
+    writePly(interface);
 }

@@ -403,3 +403,7 @@ void Interface::removeHalfEdgeFromCollection(HalfEdge* e)
         }
     }
 }
+
+QMap<QPointF, Vertex*>& Interface::getVertices() {
+    return vertices;
+}
